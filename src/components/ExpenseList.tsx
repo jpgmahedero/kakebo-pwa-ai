@@ -1,5 +1,5 @@
 import type { Expense } from '../types';
-import { MOCK_CATEGORIES } from '../lib/mock-data';
+import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES } from '../lib/mock-data';
 import { formatCurrency, formatDateString } from '../lib/utils';
 import * as LucideIcons from 'lucide-react';
 import { createElement } from 'react';
@@ -33,6 +33,7 @@ export function ExpenseList({ expenses }: Props) {
     <ul className="divide-y divide-gray-50">
       {expenses.map((expense) => {
         const category = MOCK_CATEGORIES.find(c => c.id === expense.categoryId);
+        const subCategory = MOCK_SUBCATEGORIES.find(s => s.id === expense.subCategoryId);
         const dateObj = new Date(expense.date);
         const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
@@ -56,11 +57,13 @@ export function ExpenseList({ expenses }: Props) {
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
                   <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
-                    {category?.pillar}
+                    {category?.name || 'Categoría'}
                   </span>
-                  <span className="text-gray-400">
-                    {category?.name}
-                  </span>
+                  {subCategory && (
+                    <span className="text-gray-400">
+                      {subCategory.name}
+                    </span>
+                  )}
                   <span className="text-gray-300">•</span>
                   <span className="text-gray-400 flex items-center gap-1">
                     <LucideIcons.User className="w-2.5 h-2.5" /> {expense.whoPaid}

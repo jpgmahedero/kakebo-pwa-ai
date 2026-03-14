@@ -1,10 +1,7 @@
 export type ExpenseType = 'fixed' | 'variable';
 
-export type Pillar = 'Supervivencia' | 'Ocio' | 'Cultura' | 'Extras';
-
 export interface Category {
   id: string;
-  pillar: Pillar;
   name: string;
   color?: string;
   icon?: string;

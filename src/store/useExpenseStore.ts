@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import localforage from 'localforage';
-import type { Expense } from '../types';
+import type { Expense, Category, SubCategory } from '../types';
+import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES } from '../lib/mock-data';
 
 interface ExpenseState {
   expenses: Expense[];
+  categories: Category[];
+  subCategories: SubCategory[];
   addExpense: (expense: Expense) => void;
   removeExpense: (id: string) => void;
   updateExpense: (id: string, updatedExpense: Partial<Expense>) => void;
+  addCategory: (category: Category) => void;
+  addSubCategory: (subCategory: SubCategory) => void;
   clearExpenses: () => void;
 }
 
@@ -21,6 +26,8 @@ export const useExpenseStore = create<ExpenseState>()(
   persist(
     (set) => ({
       expenses: [],
+      categories: MOCK_CATEGORIES,
+      subCategories: MOCK_SUBCATEGORIES,
       addExpense: (expense) =>
         set((state) => ({ expenses: [expense, ...state.expenses] })),
       removeExpense: (id) =>
@@ -33,6 +40,10 @@ export const useExpenseStore = create<ExpenseState>()(
             e.id === id ? { ...e, ...updatedExpense, updatedAt: new Date().toISOString() } : e
           ),
         })),
+      addCategory: (category) =>
+        set((state) => ({ categories: [...state.categories, category] })),
+      addSubCategory: (subCategory) =>
+        set((state) => ({ subCategories: [...state.subCategories, subCategory] })),
       clearExpenses: () => set({ expenses: [] }),
     }),
     {
