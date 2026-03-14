@@ -7,20 +7,35 @@ import { Plus, Wallet, TrendingDown } from 'lucide-react';
 import './index.css';
 
 function App() {
-  const { expenses, addExpense } = useExpenseStore();
+  const { expenses, addExpense, updateExpense } = useExpenseStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   
-  const handleSaveExpense = (newExpenseData: any) => {
-    const newExpense: Expense = {
-      ...newExpenseData,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+  const handleSaveExpense = (expenseData: any) => {
+    if (editingExpense) {
+      updateExpense(editingExpense.id, expenseData);
+    } else {
+      const newExpense: Expense = {
+        ...expenseData,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      addExpense(newExpense);
+    }
     
-    // Add to persistent store
-    addExpense(newExpense);
     setIsFormOpen(false);
+    setEditingExpense(null);
+  };
+
+  const handleOpenAddForm = () => {
+    setEditingExpense(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setIsFormOpen(true);
   };
 
   // Calculate total
@@ -73,14 +88,17 @@ function App() {
             </button>
           </div>
           
-          <ExpenseList expenses={expenses} />
+          <ExpenseList 
+            expenses={expenses} 
+            onExpenseClick={handleEditExpense} 
+          />
         </div>
         
       </main>
 
       {/* Floating Action Button (FAB) */}
       <button 
-        onClick={() => setIsFormOpen(true)}
+        onClick={handleOpenAddForm}
         className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 w-16 h-16 bg-indigo-600 rounded-full shadow-lg shadow-indigo-200 flex items-center justify-center text-white hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 z-40 group border border-indigo-500/50 focus:outline-none focus:ring-4 focus:ring-indigo-300"
         aria-label="Añadir nuevo gasto"
       >
@@ -90,8 +108,12 @@ function App() {
       {/* Add Expense Modal */}
       <AddExpenseForm 
         isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingExpense(null);
+        }} 
         onSave={handleSaveExpense}
+        initialData={editingExpense}
       />
 
     </div>

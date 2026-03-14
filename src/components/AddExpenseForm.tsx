@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { X, MapPin, Store, User, Calendar, Tag, Plus, ChevronRight } from 'lucide-react';
+import { X, MapPin, Store, User, Calendar, Tag, Plus, ChevronRight, Trash2 } from 'lucide-react';
 import { useExpenseStore } from '../store/useExpenseStore';
-import type { ExpenseType, Category, SubCategory } from '../types';
+import type { Expense, ExpenseType, Category, SubCategory } from '../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSave: (expenseData: any) => void;
+  initialData?: Expense | null;
 }
 
-export function AddExpenseForm({ isOpen, onClose, onSave }: Props) {
-  const { categories, subCategories, addCategory, addSubCategory } = useExpenseStore();
+export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) {
+  const { categories, subCategories, addCategory, addSubCategory, removeSubCategory } = useExpenseStore();
   
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -29,27 +29,47 @@ export function AddExpenseForm({ isOpen, onClose, onSave }: Props) {
   const [isAddingNewSubCategory, setIsAddingNewSubCategory] = useState(false);
   const [newSubCategoryName, setNewSubCategoryName] = useState('');
 
-  // Set default category if not set
+  // Handle initialData for editing
   useEffect(() => {
-    if (!categoryId && categories.length > 0) {
-      setCategoryId(categories[0].id);
+    if (initialData) {
+      setAmount(initialData.amount.toString());
+      setDescription(initialData.description);
+      setCategoryId(initialData.categoryId);
+      setSubCategoryId(initialData.subCategoryId || '');
+      setWhoPaid(initialData.whoPaid);
+      setKnownPlace(initialData.knownPlace || '');
+      setLocation(initialData.location || '');
+      setType(initialData.type);
+      setDate(new Date(initialData.date).toISOString().slice(0, 16));
+    } else {
+      // Default initial states when not editing
+      setAmount('');
+      setDescription('');
+      setWhoPaid('Jose');
+      setKnownPlace('');
+      setLocation('');
+      setDate(new Date().toISOString().slice(0, 16));
     }
-  }, [categories, categoryId]);
+  }, [initialData, isOpen]);
 
   // Filter subcategories based on selected category
   const filteredSubCategories = subCategories.filter(sub => sub.categoryId === categoryId);
 
-  // Set default subcategory when category changes
+  // Set default subcategory when category changes (only if not editing or if subcategory doesn't belong to category)
   useEffect(() => {
-    if (categoryId) {
-      const firstSub = subCategories.find(sub => sub.categoryId === categoryId);
-      if (firstSub) {
-        setSubCategoryId(firstSub.id);
+    if (categoryId && !isAddingNewCategory) {
+      if (initialData && initialData.categoryId === categoryId && initialData.subCategoryId) {
+        setSubCategoryId(initialData.subCategoryId);
       } else {
-        setSubCategoryId('');
+        const firstSub = subCategories.find(sub => sub.categoryId === categoryId);
+        if (firstSub) {
+          setSubCategoryId(firstSub.id);
+        } else {
+          setSubCategoryId('');
+        }
       }
     }
-  }, [categoryId, subCategories]);
+  }, [categoryId, subCategories, initialData]);
 
   if (!isOpen) return null;
 
@@ -121,7 +141,9 @@ export function AddExpenseForm({ isOpen, onClose, onSave }: Props) {
       <div className="relative bg-white w-full sm:max-w-lg rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:zoom-in-95 duration-200 my-auto">
         
         <div className="px-6 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10 pt-6 pb-4">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Nuevo Gasto</h2>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+            {initialData ? 'Editar Gasto' : 'Nuevo Gasto'}
+          </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100/50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
@@ -287,19 +309,44 @@ export function AddExpenseForm({ isOpen, onClose, onSave }: Props) {
                 </label>
                 
                 <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSubCategoryId('')}
+                    className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${
+                      subCategoryId === ''
+                        ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                        : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                    }`}
+                  >
+                    Ninguna
+                  </button>
                   {filteredSubCategories.map((sub) => (
-                    <button
-                      key={sub.id}
-                      type="button"
-                      onClick={() => setSubCategoryId(sub.id)}
-                      className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${
-                        subCategoryId === sub.id
-                          ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
-                          : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
-                      }`}
-                    >
-                      {sub.name}
-                    </button>
+                    <div key={sub.id} className="relative group">
+                      <button
+                        type="button"
+                        onClick={() => setSubCategoryId(sub.id)}
+                        className={`w-full py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 pr-7 ${
+                          subCategoryId === sub.id
+                            ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                            : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                        }`}
+                      >
+                        {sub.name}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`¿Eliminar la subcategoría "${sub.name}"?`)) {
+                            removeSubCategory(sub.id);
+                            if (subCategoryId === sub.id) setSubCategoryId('');
+                          }
+                        }}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   ))}
                   
                   {!isAddingNewSubCategory ? (
@@ -346,7 +393,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave }: Props) {
               type="submit"
               className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl shadow-xl hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Guardar Gasto
+              {initialData ? 'Actualizar Gasto' : 'Guardar Gasto'}
             </button>
           </div>
         </form>

@@ -14,6 +14,8 @@
   - [x] Update `AddExpenseForm` with missing fields
   - [x] Reconstruct Mock Data with original Pillars
   - [x] Refactor: Remove Pillars, implement Category/Subcategory hierarchy
+  - [x] Feature: Edit existing expenses
+  - [x] Refinement: Subcategory display and deletion logic
 - [ ] Phase 2: Kakebo Strategy & Budgeting
   - [ ] Update Types & Data Model (`MonthlyPlan`)
   - [ ] Create `usePlanStore` for persistence

@@ -9,25 +9,23 @@ Antes de pasar a la planificación mensual, debemos asegurar que el modelo de da
 ### [Modelo de Datos]
 
 #### [MODIFICAR] [index.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/types/index.ts)
-- Definir el tipo `Pillar` (Supervivencia, Ocio, Cultura, Extras).
-- Actualizar relaciones de `Category` y `SubCategory` (cada categoría pertenece a un Pilar).
-- Campos actualizados en la interfaz `Expense`:
-    - `categoryId` (obligatorio)
-    - `knownPlace` (Sitio)
-    - `location` (Ubicación física/coordenadas)
-    - `description` (Descripción)
-    - `type` (Variable o Fijo)
-    - `whoPaid` (Quién ha hecho el gasto)
-    - `date` (Fecha y hora ISO)
+- Eliminar tipo `Pillar`.
+- `Category`: Categoría de nivel superior (ej: Supervivencia, Ocio).
+- `SubCategory`: Pertenece a una `Category` (ej: Comida, Transporte).
+- `Expense`: Incluye `categoryId` y `subCategoryId`.
 
-### [Componentes UI]
+### [Gastos]
 
 #### [MODIFICAR] [AddExpenseForm.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/AddExpenseForm.tsx)
-- Implementar lógica de selección jerárquica: Pilar -> Categoría.
-- Añadir campos para Sitio, Ubicación, Quién pagó y Fecha/Hora.
+- Añadir prop `initialData` para cargar datos al editar.
+- Cambiar el título "Nuevo Gasto" a "Editar Gasto" según el modo.
 
-#### [MODIFICAR] [mock-data.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/lib/mock-data.ts)
-- Reconstruir la jerarquía de categorías con los 4 pilares originales.
+#### [MODIFICAR] [App.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/App.tsx)
+- Gestionar estado `editingExpense`.
+- Pasar el gasto seleccionado al formulario.
+
+#### [MODIFICAR] [ExpenseList.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/ExpenseList.tsx)
+- Añadir prop `onExpenseClick` para disparar la edición.
 
 ---
 
@@ -69,6 +67,6 @@ Esta fase implementa el núcleo del método: la planificación del mes. Al defin
 - Ejecutar `npm run build` para verificar el empaquetado de producción.
 
 ### Verificación Manual
-1.  **Configuración de Plan (Fase 2)**: Introducir 2000€ (Ingresos), 500€ (Ahorro) y 1000€ (Gastos Fijos).
-2.  **Cálculo**: Verificar que el "Total Disponible" muestra 500€ para el mes.
-3.  **Impacto de Gastos**: Añadir un gasto de 50€ y ver cómo el "Disponible" disminuye dinámicamente.
+1.  **Editar Gasto**: Hacer clic en un gasto existente, cambiar el importe y verificar que se actualiza.
+2.  **Configuración de Plan (Fase 2)**: Introducir 2000€ (Ingresos), 500€ (Ahorro) y 1000€ (Gastos Fijos).
+3.  **Cálculo**: Verificar que el "Total Disponible" muestra 500€ para el mes.

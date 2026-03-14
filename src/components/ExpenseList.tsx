@@ -1,11 +1,12 @@
 import type { Expense } from '../types';
-import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES } from '../lib/mock-data';
+import { useExpenseStore } from '../store/useExpenseStore';
 import { formatCurrency, formatDateString } from '../lib/utils';
 import * as LucideIcons from 'lucide-react';
 import { createElement } from 'react';
 
 interface Props {
   expenses: Expense[];
+  onExpenseClick?: (expense: Expense) => void;
 }
 
 // Helper para renderizar iconos dinámicamente desde el string name en la base de datos
@@ -14,7 +15,9 @@ const IconMap = (name: string, props: any) => {
   return createElement(IconComponent, props);
 };
 
-export function ExpenseList({ expenses }: Props) {
+export function ExpenseList({ expenses, onExpenseClick }: Props) {
+  const { categories, subCategories } = useExpenseStore();
+
   if (expenses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
@@ -32,13 +35,17 @@ export function ExpenseList({ expenses }: Props) {
   return (
     <ul className="divide-y divide-gray-50">
       {expenses.map((expense) => {
-        const category = MOCK_CATEGORIES.find(c => c.id === expense.categoryId);
-        const subCategory = MOCK_SUBCATEGORIES.find(s => s.id === expense.subCategoryId);
+        const category = categories.find(c => c.id === expense.categoryId);
+        const subCategory = subCategories.find(s => s.id === expense.subCategoryId);
         const dateObj = new Date(expense.date);
         const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
         return (
-          <li key={expense.id} className="py-4 hover:bg-gray-50/50 transition-colors rounded-2xl px-3 -mx-3 flex items-center justify-between group cursor-pointer">
+          <li 
+            key={expense.id} 
+            onClick={() => onExpenseClick?.(expense)}
+            className="py-4 hover:bg-gray-50/50 transition-colors rounded-2xl px-3 -mx-3 flex items-center justify-between group cursor-pointer"
+          >
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div 
                 className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"

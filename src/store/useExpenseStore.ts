@@ -13,6 +13,7 @@ interface ExpenseState {
   updateExpense: (id: string, updatedExpense: Partial<Expense>) => void;
   addCategory: (category: Category) => void;
   addSubCategory: (subCategory: SubCategory) => void;
+  removeSubCategory: (id: string) => void;
   clearExpenses: () => void;
 }
 
@@ -44,6 +45,8 @@ export const useExpenseStore = create<ExpenseState>()(
         set((state) => ({ categories: [...state.categories, category] })),
       addSubCategory: (subCategory) =>
         set((state) => ({ subCategories: [...state.subCategories, subCategory] })),
+      removeSubCategory: (id) =>
+        set((state) => ({ subCategories: state.subCategories.filter(s => s.id !== id) })),
       clearExpenses: () => set({ expenses: [] }),
     }),
     {
