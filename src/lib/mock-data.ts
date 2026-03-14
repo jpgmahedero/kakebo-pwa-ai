@@ -1,49 +1,60 @@
-import type { Expense } from '../types';
+import type { Expense, Category } from '../types';
+
+export const MOCK_CATEGORIES: Category[] = [
+  // Supervivencia
+  { id: 'c1', pillar: 'Supervivencia', name: 'Alimentación', color: '#10B981', icon: 'Utensils' },
+  { id: 'c2', pillar: 'Supervivencia', name: 'Transporte', color: '#3B82F6', icon: 'Bus' },
+  { id: 'c3', pillar: 'Supervivencia', name: 'Salud', color: '#EF4444', icon: 'Heart' },
+  
+  // Ocio
+  { id: 'c4', pillar: 'Ocio', name: 'Restaurantes', color: '#F59E0B', icon: 'GlassWater' },
+  { id: 'c5', pillar: 'Ocio', name: 'Tabaco/Bebida', color: '#8B5CF6', icon: 'Beer' },
+  
+  // Cultura
+  { id: 'c6', pillar: 'Cultura', name: 'Libros/Cine', color: '#6366F1', icon: 'Book' },
+  
+  // Extras
+  { id: 'c7', pillar: 'Extras', name: 'Ropa', color: '#EC4899', icon: 'Shirt' },
+  { id: 'c8', pillar: 'Extras', name: 'Regalos', color: '#06B6D4', icon: 'Gift' },
+];
 
 export const MOCK_EXPENSES: Expense[] = [
   {
     id: '1',
     date: new Date().toISOString(),
     amount: 15.50,
-    categoryId: 'c1', // Comida
-    subCategoryId: 'sc1', // Restaurante
+    categoryId: 'c4', // Restaurantes
     type: 'variable',
-    description: 'Menú del día',
-    paymentMethod: 'Tarjeta de crédito',
-    location: 'Centro',
-    knownPlace: 'El Buen Sabor',
+    description: 'Cena con amigos',
+    whoPaid: 'Jose',
+    paymentMethod: 'Tarjeta',
+    knownPlace: 'Pizzería Roma',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: '2',
-    date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+    date: new Date(Date.now() - 86400000).toISOString(),
     amount: 45.00,
     categoryId: 'c2', // Transporte
     type: 'fixed',
-    description: 'Abono transporte mensual',
-    paymentMethod: 'Tarjeta de débito',
+    description: 'Abono mensual',
+    whoPaid: 'Jose',
+    paymentMethod: 'Tarjeta',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: '3',
-    date: new Date(Date.now() - 172800000).toISOString(), // 2 Days ago
-    amount: 120.00,
-    categoryId: 'c4', // Ocio
+    date: new Date(Date.now() - 172800000).toISOString(),
+    amount: 12.50,
+    categoryId: 'c6', // Cultura
     type: 'variable',
-    description: 'Entradas concierto',
-    paymentMethod: 'Bizum',
+    description: 'Libro nuevo',
     whoPaid: 'Jose',
+    paymentMethod: 'Efectivo',
+    knownPlace: 'Librería Central',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
-];
-
-export const MOCK_CATEGORIES = [
-  { id: 'c1', name: 'Comida', color: '#10B981', icon: 'Utensils' },
-  { id: 'c2', name: 'Transporte', color: '#3B82F6', icon: 'Bus' },
-  { id: 'c3', name: 'Ocio', color: '#8B5CF6', icon: 'Ticket' },
-  { id: 'c4', name: 'Bebida', color: '#F59E0B', icon: 'Coffee' },
-  { id: 'c5', name: 'Ropa', color: '#EC4899', icon: 'Shirt' },
 ];

@@ -30,35 +30,51 @@ export function ExpenseList({ expenses }: Props) {
   }
 
   return (
-    <ul className="divide-y divide-gray-100">
+    <ul className="divide-y divide-gray-50">
       {expenses.map((expense) => {
         const category = MOCK_CATEGORIES.find(c => c.id === expense.categoryId);
+        const dateObj = new Date(expense.date);
+        const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
         return (
-          <li key={expense.id} className="py-4 hover:bg-gray-50/50 transition-colors rounded-xl px-2 -mx-2 flex items-center justify-between group cursor-pointer">
-            <div className="flex items-center gap-4">
+          <li key={expense.id} className="py-4 hover:bg-gray-50/50 transition-colors rounded-2xl px-3 -mx-3 flex items-center justify-between group cursor-pointer">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
               <div 
                 className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
                 style={{ backgroundColor: `${category?.color || '#9CA3AF'}15`, color: category?.color || '#9CA3AF' }}
               >
                 {IconMap(category?.icon || 'ShoppingCart', { size: 22, strokeWidth: 2.2 })}
               </div>
-              <div className="flex flex-col">
-                <p className="font-semibold text-gray-900 leading-tight mb-1 line-clamp-1">{expense.description}</p>
-                <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-                  <span className="bg-white border border-gray-200 px-2 py-0.5 rounded-md shadow-sm">
-                    {category?.name || 'Sin categoría'}
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-bold text-gray-900 leading-tight line-clamp-1">{expense.description}</p>
+                  {expense.knownPlace && (
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter truncate">
+                      @ {expense.knownPlace}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
+                    {category?.pillar}
+                  </span>
+                  <span className="text-gray-400">
+                    {category?.name}
                   </span>
                   <span className="text-gray-300">•</span>
-                  <span>{formatDateString(expense.date)}</span>
+                  <span className="text-gray-400 flex items-center gap-1">
+                    <LucideIcons.User className="w-2.5 h-2.5" /> {expense.whoPaid}
+                  </span>
                 </div>
               </div>
             </div>
             <div className="text-right shrink-0 ml-4">
-              <p className="font-bold text-gray-900 text-base">
+              <p className="font-extrabold text-gray-900 text-lg tracking-tight">
                 -{formatCurrency(expense.amount)}
               </p>
-              <p className="text-xs text-gray-400 mt-1 font-medium">{expense.paymentMethod}</p>
+              <p className="text-[10px] text-gray-400 mt-0.5 font-bold tabular-nums">
+                {formatDateString(expense.date)} • {timeStr}
+              </p>
             </div>
           </li>
         );

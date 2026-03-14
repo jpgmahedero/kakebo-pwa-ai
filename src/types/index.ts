@@ -1,7 +1,10 @@
 export type ExpenseType = 'fixed' | 'variable';
 
+export type Pillar = 'Supervivencia' | 'Ocio' | 'Cultura' | 'Extras';
+
 export interface Category {
   id: string;
+  pillar: Pillar;
   name: string;
   color?: string;
   icon?: string;
@@ -15,17 +18,17 @@ export interface SubCategory {
 
 export interface Expense {
   id: string;
-  date: string; // ISO string
+  date: string; // ISO string (includes date and time)
   amount: number;
   categoryId: string;
   subCategoryId?: string;
   type: ExpenseType;
   description: string;
-  paymentMethod: string;
-  location?: string;
-  knownPlace?: string;
-  photoUrl?: string; // Phase 2: Supabase URL or local preview
-  whoPaid?: string; // For shared expenses or multiple users
+  paymentMethod?: string;
+  location?: string; // Physical location / coordinates
+  knownPlace?: string; // "Sitio" (e.g., Starbucks, Mercadona)
+  whoPaid: string; // Who made the expense
+  photoUrl?: string;
   createdAt: string;
   updatedAt: string;
 }

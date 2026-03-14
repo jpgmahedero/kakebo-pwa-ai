@@ -1,0 +1,21 @@
+# Kakebo PWA - Task List
+
+- [x] Initial Project Setup & History Review
+- [ ] Code Consultation & Mentoring
+  - [x] Explain `App.tsx` spread operator (L15)
+  - [x] Explain `useExpenseStore` destructuring (L10)
+  - [x] Explain `useState` for form visibility (L11)
+  - [x] Explain `Array.reduce` for total calculation (L27)
+  - [x] Explain `onSave` callback pattern in `AddExpenseForm`
+  - [x] Adjust custom categories (Bebida, Ropa)
+  - [x] Copy Implementation Plan to `src/`
+- [x] Phase 1.5: Data Model & Category Alignment
+  - [x] Implement Pillar/Category hierarchy in types
+  - [x] Update `AddExpenseForm` with missing fields
+  - [x] Reconstruct Mock Data with original Pillars
+- [ ] Phase 2: Kakebo Strategy & Budgeting
+  - [ ] Update Types & Data Model (`MonthlyPlan`)
+  - [ ] Create `usePlanStore` for persistence
+  - [ ] Implement `PlanningSetup` modal/view
+  - [ ] Update Dashboard headers with Kakebo formula
+- [ ] Planning Next Development Phase
