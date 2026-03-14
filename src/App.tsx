@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import type { Expense } from './types';
-import { MOCK_EXPENSES } from './lib/mock-data';
+import { useExpenseStore } from './store/useExpenseStore';
 import { ExpenseList } from './components/ExpenseList';
 import { AddExpenseForm } from './components/AddExpenseForm';
 import { Plus, Wallet, TrendingDown } from 'lucide-react';
 import './index.css';
 
 function App() {
-  const [expenses, setExpenses] = useState<Expense[]>(MOCK_EXPENSES);
+  const { expenses, addExpense } = useExpenseStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
   
   const handleSaveExpense = (newExpenseData: any) => {
@@ -18,8 +18,8 @@ function App() {
       updatedAt: new Date().toISOString(),
     };
     
-    // Add to top of list
-    setExpenses([newExpense, ...expenses]);
+    // Add to persistent store
+    addExpense(newExpense);
     setIsFormOpen(false);
   };
 

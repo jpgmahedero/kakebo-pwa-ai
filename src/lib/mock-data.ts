@@ -30,7 +30,7 @@ export const MOCK_EXPENSES: Expense[] = [
     id: '3',
     date: new Date(Date.now() - 172800000).toISOString(), // 2 Days ago
     amount: 120.00,
-    categoryId: 'c3', // Ocio
+    categoryId: 'c4', // Ocio
     type: 'variable',
     description: 'Entradas concierto',
     paymentMethod: 'Bizum',
@@ -44,4 +44,6 @@ export const MOCK_CATEGORIES = [
   { id: 'c1', name: 'Comida', color: '#10B981', icon: 'Utensils' },
   { id: 'c2', name: 'Transporte', color: '#3B82F6', icon: 'Bus' },
   { id: 'c3', name: 'Ocio', color: '#8B5CF6', icon: 'Ticket' },
+  { id: 'c4', name: 'Bebida', color: '#F59E0B', icon: 'Coffee' },
+  { id: 'c5', name: 'Ropa', color: '#EC4899', icon: 'Shirt' },
 ];
