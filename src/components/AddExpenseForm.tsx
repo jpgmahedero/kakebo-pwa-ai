@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, MapPin, Store, User, Calendar, Tag, Plus, ChevronRight, Trash2 } from 'lucide-react';
 import { useExpenseStore } from '../store/useExpenseStore';
-import type { Expense, ExpenseType, Category, SubCategory } from '../types';
+import type { Expense, ExpenseType, Category, SubCategory, Place } from '../types';
 
 interface Props {
   isOpen: boolean;
@@ -11,31 +11,35 @@ interface Props {
 }
 
 export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) {
-  const { categories, subCategories, addCategory, addSubCategory, removeSubCategory } = useExpenseStore();
+  const { categories, subCategories, places, addCategory, addSubCategory, removeSubCategory, addPlace, removePlace } = useExpenseStore();
   
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [subCategoryId, setSubCategoryId] = useState('');
+  const [placeId, setPlaceId] = useState('');
   const [whoPaid, setWhoPaid] = useState('Jose');
   const [knownPlace, setKnownPlace] = useState('');
   const [location, setLocation] = useState('');
   const [type, setType] = useState<ExpenseType>('variable');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   
-  // State for new category/subcategory creation
+  // State for new category/subcategory/place creation
   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isAddingNewSubCategory, setIsAddingNewSubCategory] = useState(false);
   const [newSubCategoryName, setNewSubCategoryName] = useState('');
+  const [isAddingNewPlace, setIsAddingNewPlace] = useState(false);
+  const [newPlaceName, setNewPlaceName] = useState('');
 
   // Handle initialData for editing
   useEffect(() => {
     if (initialData) {
       setAmount(initialData.amount.toString());
-      setDescription(initialData.description);
+      setDescription(initialData.description || '');
       setCategoryId(initialData.categoryId);
       setSubCategoryId(initialData.subCategoryId || '');
+      setPlaceId(initialData.placeId || '');
       setWhoPaid(initialData.whoPaid);
       setKnownPlace(initialData.knownPlace || '');
       setLocation(initialData.location || '');
@@ -45,6 +49,8 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
       // Default initial states when not editing
       setAmount('');
       setDescription('');
+      setCategoryId(categories.length > 0 ? categories[0].id : '');
+      setPlaceId('');
       setWhoPaid('Jose');
       setKnownPlace('');
       setLocation('');
@@ -103,19 +109,35 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
     setNewSubCategoryName('');
     setIsAddingNewSubCategory(false);
   };
+  
+  const handleAddNewPlace = () => {
+    if (!newPlaceName.trim()) return;
+    
+    const newPlc: Place = {
+      id: crypto.randomUUID(),
+      name: newPlaceName.trim()
+    };
+    
+    addPlace(newPlc);
+    setPlaceId(newPlc.id);
+    setKnownPlace(''); // Limpiar texto manual al crear uno guardado
+    setNewPlaceName('');
+    setIsAddingNewPlace(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !description || !categoryId) return;
+    if (!amount || !categoryId) return;
 
     onSave({
       amount: parseFloat(amount),
       description,
       categoryId,
       subCategoryId,
+      placeId,
       date: new Date(date).toISOString(),
       type,
-      knownPlace,
+      knownPlace: places.find(p => p.id === placeId)?.name || knownPlace,
       location,
       whoPaid,
       paymentMethod: 'Tarjeta',
@@ -214,27 +236,115 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-['Inter']">Descripción</label>
             <input
               type="text"
-              required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ej. Cena en restaurante"
+              placeholder="Ej. Cena en restaurante (opcional)"
               className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10 focus:bg-white transition-all shadow-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="space-y-4">
+            <div className="space-y-3">
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
                 <Store className="w-3 h-3 text-indigo-500" /> Sitio
               </label>
-              <input
-                type="text"
-                value={knownPlace}
-                onChange={(e) => setKnownPlace(e.target.value)}
-                placeholder="Ej. Mercadona"
-                className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
-              />
+              
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaceId('');
+                    // Permite que knownPlace se mantenga si el usuario está escribiendo
+                  }}
+                  className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${
+                    placeId === ''
+                      ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                      : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                  }`}
+                >
+                  No definido
+                </button>
+                {places.map((place) => (
+                  <div key={place.id} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPlaceId(place.id);
+                        setKnownPlace(''); // Limpiar texto manual si selecciona uno guardado
+                      }}
+                      className={`w-full py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 pr-7 ${
+                        placeId === place.id
+                          ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                          : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                      }`}
+                    >
+                      {place.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`¿Eliminar el sitio "${place.name}"?`)) {
+                          removePlace(place.id);
+                          if (placeId === place.id) setPlaceId('');
+                        }
+                      }}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                
+                {!isAddingNewPlace ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingNewPlace(true)}
+                    className="py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 border-dashed border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-400 flex items-center justify-center gap-1 bg-white"
+                  >
+                    <Plus className="w-3 h-3" /> Nuevo
+                  </button>
+                ) : (
+                  <div className="col-span-3 flex gap-2 animate-in slide-in-from-top-2 duration-200">
+                    <input
+                      type="text"
+                      value={newPlaceName}
+                      onChange={(e) => setNewPlaceName(e.target.value)}
+                      placeholder="Nombre del sitio..."
+                      className="flex-1 px-4 py-2 bg-gray-50 border-2 border-indigo-100 rounded-xl text-sm focus:ring-0 focus:border-indigo-600"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddNewPlace}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-md"
+                    >
+                      Añadir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingNewPlace(false)}
+                      className="px-2 py-2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {placeId === '' && (
+                <div className="pt-2">
+                  <input
+                    type="text"
+                    value={knownPlace}
+                    onChange={(e) => setKnownPlace(e.target.value)}
+                    placeholder="Escribe el nombre del sitio (opcional)..."
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
+                  />
+                </div>
+              )}
             </div>
+            
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
                 <MapPin className="w-3 h-3 text-indigo-500" /> Ubicación

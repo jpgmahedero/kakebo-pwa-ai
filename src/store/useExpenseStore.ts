@@ -1,19 +1,22 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import localforage from 'localforage';
-import type { Expense, Category, SubCategory } from '../types';
+import type { Expense, Category, SubCategory, Place } from '../types';
 import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES } from '../lib/mock-data';
 
 interface ExpenseState {
   expenses: Expense[];
   categories: Category[];
   subCategories: SubCategory[];
+  places: Place[];
   addExpense: (expense: Expense) => void;
   removeExpense: (id: string) => void;
   updateExpense: (id: string, updatedExpense: Partial<Expense>) => void;
   addCategory: (category: Category) => void;
   addSubCategory: (subCategory: SubCategory) => void;
   removeSubCategory: (id: string) => void;
+  addPlace: (place: Place) => void;
+  removePlace: (id: string) => void;
   clearExpenses: () => void;
 }
 
@@ -29,6 +32,7 @@ export const useExpenseStore = create<ExpenseState>()(
       expenses: [],
       categories: MOCK_CATEGORIES,
       subCategories: MOCK_SUBCATEGORIES,
+      places: [],
       addExpense: (expense) =>
         set((state) => ({ expenses: [expense, ...state.expenses] })),
       removeExpense: (id) =>
@@ -47,22 +51,16 @@ export const useExpenseStore = create<ExpenseState>()(
         set((state) => ({ subCategories: [...state.subCategories, subCategory] })),
       removeSubCategory: (id) =>
         set((state) => ({ subCategories: state.subCategories.filter(s => s.id !== id) })),
+      addPlace: (place) =>
+        set((state) => ({ places: [...state.places, place] })),
+      removePlace: (id) =>
+        set((state) => ({ places: state.places.filter(p => p.id !== id) })),
       clearExpenses: () => set({ expenses: [] }),
     }),
     {
-      name: 'expense-storage',
-      // Usa localforage como motor de persistencia (usa IndexedDB optimizadamente)
-      storage: createJSONStorage(() => ({
-        getItem: async (name: string): Promise<string | null> => {
-          return (await localforage.getItem(name)) || null;
-        },
-        setItem: async (name: string, value: string): Promise<void> => {
-          await localforage.setItem(name, value);
-        },
-        removeItem: async (name: string): Promise<void> => {
-          await localforage.removeItem(name);
-        },
-      })),
+      name: 'kakebo-storage',
+      version: 2, // Incrementado para vaciar la BBDD (reset persist)
+      storage: createJSONStorage(() => localforage as any),
     }
   )
 );

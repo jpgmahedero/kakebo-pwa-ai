@@ -13,19 +13,25 @@ export interface SubCategory {
   name: string;
 }
 
+export interface Place {
+  id: string;
+  name: string;
+  address?: string;
+}
+
 export interface Expense {
   id: string;
   date: string; // ISO string (includes date and time)
   amount: number;
   categoryId: string;
   subCategoryId?: string;
+  placeId?: string;
   type: ExpenseType;
-  description: string;
+  description?: string;
+  whoPaid: string; // Who made the expense
   paymentMethod?: string;
   location?: string; // Physical location / coordinates
-  knownPlace?: string; // "Sitio" (e.g., Starbucks, Mercadona)
-  whoPaid: string; // Who made the expense
-  photoUrl?: string;
+  knownPlace?: string; // Mantener para compatibilidad o texto libre
   createdAt: string;
   updatedAt: string;
 }

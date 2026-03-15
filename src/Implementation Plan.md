@@ -12,13 +12,15 @@ Antes de pasar a la planificación mensual, debemos asegurar que el modelo de da
 - Eliminar tipo `Pillar`.
 - `Category`: Categoría de nivel superior (ej: Supervivencia, Ocio).
 - `SubCategory`: Pertenece a una `Category` (ej: Comida, Transporte).
-- `Expense`: Incluye `categoryId` y `subCategoryId`.
+- `Place`: Sitio guardado (ej: Mercadona, Bar Paco).
+- `Expense`: Incluye `categoryId`, `subCategoryId` y opcionalmente `placeId`.
 
 ### [Gastos]
 
 #### [MODIFICAR] [AddExpenseForm.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/AddExpenseForm.tsx)
 - Añadir prop `initialData` para cargar datos al editar.
 - Cambiar el título "Nuevo Gasto" a "Editar Gasto" según el modo.
+- Implementar gestión de Sitios (Selección, Creación y Borrado).
 
 #### [MODIFICAR] [App.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/App.tsx)
 - Gestionar estado `editingExpense`.

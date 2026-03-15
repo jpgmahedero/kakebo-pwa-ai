@@ -16,6 +16,9 @@
   - [x] Refactor: Remove Pillars, implement Category/Subcategory hierarchy
   - [x] Feature: Edit existing expenses
   - [x] Refinement: Subcategory display and deletion logic
+  - [x] Feature: Manage Places (add, delete, select)
+  - [x] Refinement: Make expense description optional
+  - [x] Action: Reset Database and refine Place selection auto-assignment
 - [ ] Phase 2: Kakebo Strategy & Budgeting
   - [ ] Update Types & Data Model (`MonthlyPlan`)
   - [ ] Create `usePlanStore` for persistence

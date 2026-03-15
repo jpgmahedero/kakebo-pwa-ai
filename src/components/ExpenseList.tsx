@@ -16,7 +16,7 @@ const IconMap = (name: string, props: any) => {
 };
 
 export function ExpenseList({ expenses, onExpenseClick }: Props) {
-  const { categories, subCategories } = useExpenseStore();
+  const { categories, subCategories, places } = useExpenseStore();
 
   if (expenses.length === 0) {
     return (
@@ -37,6 +37,8 @@ export function ExpenseList({ expenses, onExpenseClick }: Props) {
       {expenses.map((expense) => {
         const category = categories.find(c => c.id === expense.categoryId);
         const subCategory = subCategories.find(s => s.id === expense.subCategoryId);
+        const place = places.find(p => p.id === expense.placeId);
+        const placeName = place?.name || expense.knownPlace;
         const dateObj = new Date(expense.date);
         const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
@@ -55,10 +57,12 @@ export function ExpenseList({ expenses, onExpenseClick }: Props) {
               </div>
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="font-bold text-gray-900 leading-tight line-clamp-1">{expense.description}</p>
-                  {expense.knownPlace && (
+                  <p className="font-bold text-gray-900 leading-tight line-clamp-1">
+                    {expense.description || category?.name || 'Gasto'}
+                  </p>
+                  {placeName && (
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter truncate">
-                      @ {expense.knownPlace}
+                      @ {placeName}
                     </span>
                   )}
                 </div>
