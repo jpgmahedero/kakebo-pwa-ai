@@ -83,7 +83,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
     if (!newCategoryName.trim()) return;
     
     const newCat: Category = {
-      id: crypto.randomUUID(),
+      id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11),
       name: newCategoryName.trim(),
       color: '#6366F1',
       icon: 'Tag'
@@ -99,13 +99,14 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
     if (!newSubCategoryName.trim() || !categoryId) return;
     
     const newSub: SubCategory = {
-      id: crypto.randomUUID(),
+      id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11),
       categoryId,
       name: newSubCategoryName.trim()
     };
     
     addSubCategory(newSub);
     setSubCategoryId(newSub.id);
+    newSubCategoryName === '' && setNewSubCategoryName('');
     setNewSubCategoryName('');
     setIsAddingNewSubCategory(false);
   };
@@ -114,7 +115,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
     if (!newPlaceName.trim()) return;
     
     const newPlc: Place = {
-      id: crypto.randomUUID(),
+      id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11),
       name: newPlaceName.trim()
     };
     
@@ -176,6 +177,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
           
+          {/* 1. Cantidad y Tipo */}
           <div className="flex gap-4">
             <div className="flex-1">
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-['Inter']">Cantidad</label>
@@ -207,6 +209,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
             </div>
           </div>
 
+          {/* 2. Fecha y Quién */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
@@ -232,133 +235,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-['Inter']">Descripción</label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ej. Cena en restaurante (opcional)"
-              className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10 focus:bg-white transition-all shadow-sm"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
-                <Store className="w-3 h-3 text-indigo-500" /> Sitio
-              </label>
-              
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPlaceId('');
-                    // Permite que knownPlace se mantenga si el usuario está escribiendo
-                  }}
-                  className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${
-                    placeId === ''
-                      ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
-                      : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
-                  }`}
-                >
-                  No definido
-                </button>
-                {places.map((place) => (
-                  <div key={place.id} className="relative group">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPlaceId(place.id);
-                        setKnownPlace(''); // Limpiar texto manual si selecciona uno guardado
-                      }}
-                      className={`w-full py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 pr-7 ${
-                        placeId === place.id
-                          ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
-                          : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
-                      }`}
-                    >
-                      {place.name}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm(`¿Eliminar el sitio "${place.name}"?`)) {
-                          removePlace(place.id);
-                          if (placeId === place.id) setPlaceId('');
-                        }
-                      }}
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-                
-                {!isAddingNewPlace ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingNewPlace(true)}
-                    className="py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 border-dashed border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-400 flex items-center justify-center gap-1 bg-white"
-                  >
-                    <Plus className="w-3 h-3" /> Nuevo
-                  </button>
-                ) : (
-                  <div className="col-span-3 flex gap-2 animate-in slide-in-from-top-2 duration-200">
-                    <input
-                      type="text"
-                      value={newPlaceName}
-                      onChange={(e) => setNewPlaceName(e.target.value)}
-                      placeholder="Nombre del sitio..."
-                      className="flex-1 px-4 py-2 bg-gray-50 border-2 border-indigo-100 rounded-xl text-sm focus:ring-0 focus:border-indigo-600"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddNewPlace}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-md"
-                    >
-                      Añadir
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsAddingNewPlace(false)}
-                      className="px-2 py-2 text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {placeId === '' && (
-                <div className="pt-2">
-                  <input
-                    type="text"
-                    value={knownPlace}
-                    onChange={(e) => setKnownPlace(e.target.value)}
-                    placeholder="Escribe el nombre del sitio (opcional)..."
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
-                  />
-                </div>
-              )}
-            </div>
-            
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
-                <MapPin className="w-3 h-3 text-indigo-500" /> Ubicación
-              </label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Ciudad, Calle..."
-                className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
-              />
-            </div>
-          </div>
-
+          {/* 3. Categoría Principal */}
           <div className="space-y-4">
             <div className="space-y-3">
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1 font-['Inter']">
@@ -412,6 +289,7 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
               )}
             </div>
 
+            {/* 4. Subcategoría */}
             {categoryId && (
               <div className="space-y-3 animate-in fade-in duration-300">
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1 font-['Inter']">
@@ -496,6 +374,135 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
                 </div>
               </div>
             )}
+          </div>
+
+          {/* 5. Sitio */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
+                <Store className="w-3 h-3 text-indigo-500" /> Sitio
+              </label>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaceId('');
+                  }}
+                  className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${
+                    placeId === ''
+                      ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                      : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                  }`}
+                >
+                  No definido
+                </button>
+                {places.map((place) => (
+                  <div key={place.id} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPlaceId(place.id);
+                        setKnownPlace('');
+                      }}
+                      className={`w-full py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 pr-7 ${
+                        placeId === place.id
+                          ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-sm'
+                          : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200 shadow-sm'
+                      }`}
+                    >
+                      {place.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`¿Eliminar el sitio "${place.name}"?`)) {
+                          removePlace(place.id);
+                          if (placeId === place.id) setPlaceId('');
+                        }
+                      }}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                
+                {!isAddingNewPlace ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingNewPlace(true)}
+                    className="py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 border-dashed border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-400 flex items-center justify-center gap-1 bg-white"
+                  >
+                    <Plus className="w-3 h-3" /> Nuevo
+                  </button>
+                ) : (
+                  <div className="col-span-3 flex gap-2 animate-in slide-in-from-top-2 duration-200">
+                    <input
+                      type="text"
+                      value={newPlaceName}
+                      onChange={(e) => setNewPlaceName(e.target.value)}
+                      placeholder="Nombre del sitio..."
+                      className="flex-1 px-4 py-2 bg-gray-50 border-2 border-indigo-100 rounded-xl text-sm focus:ring-0 focus:border-indigo-600"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddNewPlace}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-md"
+                    >
+                      Añadir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingNewPlace(false)}
+                      className="px-2 py-2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {placeId === '' && (
+                <div className="pt-2">
+                  <input
+                    type="text"
+                    value={knownPlace}
+                    onChange={(e) => setKnownPlace(e.target.value)}
+                    placeholder="Escribe el nombre del sitio (opcional)..."
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* 6. Descripción */}
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-['Inter']">Descripción</label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ej. Cena en restaurante (opcional)"
+                className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10 focus:bg-white transition-all shadow-sm"
+              />
+            </div>
+
+            {/* 7. Ubicación */}
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1 font-['Inter']">
+                <MapPin className="w-3 h-3 text-indigo-500" /> Ubicación
+              </label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ciudad, Calle..."
+                className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-indigo-600/10"
+              />
+            </div>
           </div>
 
           <div className="pt-6 sticky bottom-0 bg-white/100 backdrop-blur-sm pb-2 z-20">

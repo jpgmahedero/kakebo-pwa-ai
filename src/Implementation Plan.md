@@ -2,7 +2,13 @@
 
 Este plan detalla la evolución de la aplicación desde un rastreador de gastos simple hasta un sistema completo de gestión Kakebo.
 
-## Fase 1.5: Alineación de Modelo de Datos y Categorías (EN CURSO)
+## Configuración PWA (Siguiente Paso)
+Para que la aplicación sea instalable y funcione offline:
+- Instalar `vite-plugin-pwa`.
+- Configurar `manifest.json` (Nombre, iconos, colores).
+- Generar Service Worker básico.
+
+## Fase 1.5: Alineación de Modelo de Datos y Categorías (COMPLETADO)
 
 Antes de pasar a la planificación mensual, debemos asegurar que el modelo de datos soporte el nivel de detalle requerido por el método Kakebo.
 
@@ -33,32 +39,33 @@ Antes de pasar a la planificación mensual, debemos asegurar que el modelo de da
 
 ## Fase 2: Estrategia Kakebo y Presupuesto
 
-Esta fase implementa el núcleo del método: la planificación del mes. Al definir ingresos, gastos fijos y objetivo de ahorro, la app calculará el "disponible" real.
+Esta fase implementa el núcleo del método: la planificación mensual. Al definir ingresos, gastos fijos y ahorro, la app calculará el "disponible" real.
 
 ### [Modelo de Datos y Store]
 
 #### [MODIFICAR] [index.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/types/index.ts)
-- Añadir interfaz `MonthlyPlan`.
-- Añadir tipos para `Income` (Ingresos) y `FixedExpense` (Gastos Fijos).
+- `Income`: { id, amount, description, source }
+- `FixedExpense`: { id, amount, description, categoryId }
+- `MonthlyPlan`: { month, year, income: Income[], savingsGoal: number, fixedExpenses: FixedExpense[] }
 
-#### [NUEVO] [usePlanStore.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/store/usePlanStore.ts)
-- Crear una tienda persistente para el `MonthlyPlan`.
-- Acciones para definir Ingresos, Objetivo de Ahorro y lista de Gastos Fijos.
+#### [NUEVO] [usePlanStore.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/store/usePlanStore.ts) / [MODIFICAR] [useExpenseStore.ts](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/store/useExpenseStore.ts)
+- Decisión: Integrar el presupuesto en la tienda actual para facilitar cálculos cruzados.
+- Añadir estado para `budget` (ingresos, ahorro, fijos).
 
 ---
 
 ### [Componentes UI]
 
-#### [NUEVO] [PlanningDashboard.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/PlanningDashboard.tsx)
-- Vista/Modal para introducir:
-    - Ingresos mensuales previstos.
-    - Objetivo de ahorro.
-    - Gastos fijos (Alquiler, Internet, Suscripciones).
-- Resumen visual del "Saldo Disponible" mensual.
+#### [NUEVO] [MonthlyBudgetHeader.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/MonthlyBudgetHeader.tsx)
+- Card principal que muestra:
+    - "Disponible hoy" (Calculado como: (Total - Gastado) / Días restantes).
+    - Barra de progreso del presupuesto mensual.
 
-#### [MODIFICAR] [App.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/App.tsx)
-- Integrar el resumen de planificación en la cabecera.
-- Mostrar "Disponible Hoy" o "Disponible esta Semana" basado en la fórmula Kakebo.
+#### [NUEVO] [BudgetSetupModal.tsx](file:///home/jose/Documents/dev/kakebo/kakebo-pwa-ai/src/components/BudgetSetupModal.tsx)
+- Formulario paso a paso para configurar el mes:
+    1. **Ingresos:** ¿Cuánto espero ganar?
+    2. **Ahorro:** ¿Cuánto quiero guardar?
+    3. **Gastos Fijos:** Alquiler, facturas, etc.
 
 ---
 

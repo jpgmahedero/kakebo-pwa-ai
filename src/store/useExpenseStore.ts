@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import localforage from 'localforage';
 import type { Expense, Category, SubCategory, Place } from '../types';
-import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES } from '../lib/mock-data';
+import { MOCK_CATEGORIES, MOCK_SUBCATEGORIES, MOCK_PLACES } from '../lib/mock-data';
 
 interface ExpenseState {
   expenses: Expense[];
@@ -32,7 +32,7 @@ export const useExpenseStore = create<ExpenseState>()(
       expenses: [],
       categories: MOCK_CATEGORIES,
       subCategories: MOCK_SUBCATEGORIES,
-      places: [],
+      places: MOCK_PLACES,
       addExpense: (expense) =>
         set((state) => ({ expenses: [expense, ...state.expenses] })),
       removeExpense: (id) =>
@@ -59,7 +59,7 @@ export const useExpenseStore = create<ExpenseState>()(
     }),
     {
       name: 'kakebo-storage',
-      version: 2, // Incrementado para vaciar la BBDD (reset persist)
+      version: 3, // Incrementado para aplicar nuevas categorías y sitios por defecto
       storage: createJSONStorage(() => localforage as any),
     }
   )

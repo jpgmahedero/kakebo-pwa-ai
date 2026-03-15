@@ -9,6 +9,7 @@
   - [x] Explain `onSave` callback pattern in `AddExpenseForm`
   - [x] Adjust custom categories (Bebida, Ropa)
   - [x] Copy Implementation Plan to `src/`
+- [x] PWA Setup: Manifest & Service Worker
 - [x] Phase 1.5: Data Model & Category Alignment
   - [x] Implement Pillar/Category hierarchy in types
   - [x] Update `AddExpenseForm` with missing fields
@@ -20,8 +21,9 @@
   - [x] Refinement: Make expense description optional
   - [x] Action: Reset Database and refine Place selection auto-assignment
 - [ ] Phase 2: Kakebo Strategy & Budgeting
-  - [ ] Update Types & Data Model (`MonthlyPlan`)
-  - [ ] Create `usePlanStore` for persistence
-  - [ ] Implement `PlanningSetup` modal/view
-  - [ ] Update Dashboard headers with Kakebo formula
+  - [ ] Update Types: `Income`, `FixedExpense`, `MonthlyPlan`
+  - [ ] Update Store: Add budget management to `useExpenseStore`
+  - [ ] UI: Create `MonthlyBudgetHeader` for available balance
+  - [ ] UI: Create `BudgetSetupModal` for monthly planning
+  - [ ] UI: Integrate "Daily Budget" calculation logic
 - [ ] Planning Next Development Phase

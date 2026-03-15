@@ -1,28 +1,18 @@
-import type { Expense, Category, SubCategory } from '../types';
+import type { Expense, Category, SubCategory, Place } from '../types';
 
 export const MOCK_CATEGORIES: Category[] = [
-  { id: 'cat1', name: 'Supervivencia', color: '#10B981', icon: 'HeartPulse' },
-  { id: 'cat2', name: 'Ocio', color: '#F59E0B', icon: 'GlassWater' },
-  { id: 'cat3', name: 'Cultura', color: '#6366F1', icon: 'Book' },
-  { id: 'cat4', name: 'Extras', color: '#EF4444', icon: 'PlusCircle' },
+  { id: 'cat-alim', name: 'Alimentación', color: '#10B981', icon: 'ShoppingBasket' },
+  { id: 'cat-ocio', name: 'Ocio', color: '#F59E0B', icon: 'GlassWater' },
+  { id: 'cat-trans', name: 'Transporte', color: '#6366F1', icon: 'Bus' },
 ];
 
-export const MOCK_SUBCATEGORIES: SubCategory[] = [
-  // Supervivencia
-  { id: 's1', categoryId: 'cat1', name: 'Alimentación' },
-  { id: 's2', categoryId: 'cat1', name: 'Transporte' },
-  { id: 's3', categoryId: 'cat1', name: 'Salud' },
-  
-  // Ocio
-  { id: 's4', categoryId: 'cat2', name: 'Restaurantes' },
-  { id: 's5', categoryId: 'cat2', name: 'Tabaco/Bebida' },
-  
-  // Cultura
-  { id: 's6', categoryId: 'cat3', name: 'Libros/Cine' },
-  
-  // Extras
-  { id: 's7', categoryId: 'cat4', name: 'Ropa' },
-  { id: 's8', categoryId: 'cat4', name: 'Regalos' },
+export const MOCK_SUBCATEGORIES: SubCategory[] = [];
+
+export const MOCK_PLACES: Place[] = [
+  { id: 'p1', name: 'Condis' },
+  { id: 'p2', name: 'Mercadona' },
+  { id: 'p3', name: 'Carrefour' },
+  { id: 'p4', name: 'TMB' },
 ];
 
 export const MOCK_EXPENSES: Expense[] = [];

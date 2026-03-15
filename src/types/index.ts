@@ -35,3 +35,27 @@ export interface Expense {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Income {
+  id: string;
+  amount: number;
+  description: string;
+  source: string;
+  date: string;
+}
+
+export interface FixedExpense {
+  id: string;
+  amount: number;
+  description: string;
+  categoryId: string; // Associated primary category
+  date: string;
+}
+
+export interface MonthlyPlan {
+  month: number; // 0-11
+  year: number;
+  incomes: Income[];
+  savingsGoal: number;
+  fixedExpenses: FixedExpense[];
+}
