@@ -13,7 +13,9 @@ const INITIAL_FILTERS = {
   minAmount: '',
   maxAmount: '',
   whoPaid: '',
-  type: 'all' as ExpenseType | 'all'
+  type: 'all' as ExpenseType | 'all',
+  categoryId: '',
+  subCategoryId: ''
 };
 
 function App() {
@@ -84,6 +86,12 @@ function App() {
 
     // Type
     if (advancedFilters.type !== 'all' && expense.type !== advancedFilters.type) return false;
+
+    // Category
+    if (advancedFilters.categoryId && expense.categoryId !== advancedFilters.categoryId) return false;
+
+    // Subcategory
+    if (advancedFilters.subCategoryId && expense.subCategoryId !== advancedFilters.subCategoryId) return false;
 
     return true;
   });
