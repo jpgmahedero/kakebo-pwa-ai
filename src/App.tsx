@@ -1,16 +1,30 @@
 import { useState } from 'react';
-import type { Expense } from './types';
+import type { Expense, ExpenseType } from './types';
 import { useExpenseStore } from './store/useExpenseStore';
 import { ExpenseList } from './components/ExpenseList';
 import { AddExpenseForm } from './components/AddExpenseForm';
-import { Plus, Wallet, TrendingDown, Search } from 'lucide-react';
+import { AdvancedFilters } from './components/AdvancedFilters';
+import { Plus, Wallet, TrendingDown, Search, SlidersHorizontal } from 'lucide-react';
 import './index.css';
+
+const INITIAL_FILTERS = {
+  startDate: '',
+  endDate: '',
+  minAmount: '',
+  maxAmount: '',
+  whoPaid: '',
+  type: 'all' as ExpenseType | 'all'
+};
 
 function App() {
   const { expenses, categories, places, addExpense, updateExpense } = useExpenseStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Advanced filters state
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState(INITIAL_FILTERS);
   
   const handleSaveExpense = (expenseData: any) => {
     if (editingExpense) {
@@ -45,20 +59,40 @@ function App() {
     const place = places.find(p => p.id === expense.placeId);
     const placeName = place?.name || expense.knownPlace || '';
     
+    // 1. Basic search query
     const query = searchQuery.toLowerCase();
-    
-    return (
+    const matchesSearch = query === '' || 
       (expense.description?.toLowerCase().includes(query)) ||
       (category?.name.toLowerCase().includes(query)) ||
-      (placeName.toLowerCase().includes(query))
-    );
+      (placeName.toLowerCase().includes(query));
+
+    if (!matchesSearch) return false;
+
+    // 2. Advanced filters
+    const expenseDate = new Date(expense.date).toISOString().split('T')[0];
+    
+    // Date Range
+    if (advancedFilters.startDate && expenseDate < advancedFilters.startDate) return false;
+    if (advancedFilters.endDate && expenseDate > advancedFilters.endDate) return false;
+
+    // Amount Range
+    if (advancedFilters.minAmount && expense.amount < parseFloat(advancedFilters.minAmount)) return false;
+    if (advancedFilters.maxAmount && expense.amount > parseFloat(advancedFilters.maxAmount)) return false;
+
+    // Who Paid
+    if (advancedFilters.whoPaid && !expense.whoPaid.toLowerCase().includes(advancedFilters.whoPaid.toLowerCase())) return false;
+
+    // Type
+    if (advancedFilters.type !== 'all' && expense.type !== advancedFilters.type) return false;
+
+    return true;
   });
 
-  // Calculate total (all expenses or filtered?) -> Kakebo usually shows total of the month.
-  // We'll keep it as total of all for now as it was.
-  const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  // Calculate total (we show the total of all expenses currently existing in view, or all?)
+  // Let's show the total of all as a general summary (existing behavior)
+  const totalAmount = expenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
 
-  // Import Search icon (already logic below will use it)
+  const hasActiveAdvancedFilters = Object.values(advancedFilters).some(v => v !== '' && v !== 'all');
   
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex flex-col font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-900 pb-24">
@@ -107,29 +141,53 @@ function App() {
             </button>
           </div>
 
-          <div className="relative mb-4 px-2">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Buscar por categoría, sitio o descripción..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-600/5 focus:bg-white transition-all outline-none placeholder:text-gray-400"
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 hover:text-gray-600 bg-gray-200/50 w-5 h-5 flex items-center justify-center rounded-full"
-              >
-                ×
-              </button>
-            )}
+          <div className="relative mb-4 px-2 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-600/5 focus:bg-white transition-all outline-none placeholder:text-gray-400"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 hover:text-gray-600 bg-gray-200/50 w-5 h-5 flex items-center justify-center rounded-full"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className={`p-3 rounded-2xl transition-all border flex items-center justify-center relative ${
+                isFiltersOpen || hasActiveAdvancedFilters
+                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+                  : 'bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+              {hasActiveAdvancedFilters && !isFiltersOpen && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+              )}
+            </button>
           </div>
-          
-          <ExpenseList 
-            expenses={filteredExpenses} 
-            onExpenseClick={handleEditExpense} 
+
+          <AdvancedFilters 
+            isOpen={isFiltersOpen}
+            filters={advancedFilters}
+            setFilters={setAdvancedFilters}
+            onClear={() => setAdvancedFilters(INITIAL_FILTERS)}
           />
+          
+          <div className="mt-4">
+            <ExpenseList 
+              expenses={filteredExpenses} 
+              onExpenseClick={handleEditExpense} 
+            />
+          </div>
         </div>
         
       </main>
