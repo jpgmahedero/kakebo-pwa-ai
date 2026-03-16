@@ -3,13 +3,14 @@ import type { Expense } from './types';
 import { useExpenseStore } from './store/useExpenseStore';
 import { ExpenseList } from './components/ExpenseList';
 import { AddExpenseForm } from './components/AddExpenseForm';
-import { Plus, Wallet, TrendingDown } from 'lucide-react';
+import { Plus, Wallet, TrendingDown, Search } from 'lucide-react';
 import './index.css';
 
 function App() {
-  const { expenses, addExpense, updateExpense } = useExpenseStore();
+  const { expenses, categories, places, addExpense, updateExpense } = useExpenseStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const handleSaveExpense = (expenseData: any) => {
     if (editingExpense) {
@@ -38,8 +39,26 @@ function App() {
     setIsFormOpen(true);
   };
 
-  // Calculate total
+  // Calculate filtered expenses
+  const filteredExpenses = expenses.filter(expense => {
+    const category = categories.find(c => c.id === expense.categoryId);
+    const place = places.find(p => p.id === expense.placeId);
+    const placeName = place?.name || expense.knownPlace || '';
+    
+    const query = searchQuery.toLowerCase();
+    
+    return (
+      (expense.description?.toLowerCase().includes(query)) ||
+      (category?.name.toLowerCase().includes(query)) ||
+      (placeName.toLowerCase().includes(query))
+    );
+  });
+
+  // Calculate total (all expenses or filtered?) -> Kakebo usually shows total of the month.
+  // We'll keep it as total of all for now as it was.
   const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  // Import Search icon (already logic below will use it)
   
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex flex-col font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-900 pb-24">
@@ -87,9 +106,28 @@ function App() {
               Ver todos
             </button>
           </div>
+
+          <div className="relative mb-4 px-2">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Buscar por categoría, sitio o descripción..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-600/5 focus:bg-white transition-all outline-none placeholder:text-gray-400"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 hover:text-gray-600 bg-gray-200/50 w-5 h-5 flex items-center justify-center rounded-full"
+              >
+                ×
+              </button>
+            )}
+          </div>
           
           <ExpenseList 
-            expenses={expenses} 
+            expenses={filteredExpenses} 
             onExpenseClick={handleEditExpense} 
           />
         </div>
