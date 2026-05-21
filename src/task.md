@@ -20,10 +20,40 @@
   - [x] Feature: Manage Places (add, delete, select)
   - [x] Refinement: Make expense description optional
   - [x] Action: Reset Database and refine Place selection auto-assignment
+# Kakebo PWA - Task List
+
+- [x] Initial Project Setup & History Review
+- [ ] Code Consultation & Mentoring
+  - [x] Explain `App.tsx` spread operator (L15)
+  - [x] Explain `useExpenseStore` destructuring (L10)
+  - [x] Explain `useState` for form visibility (L11)
+  - [x] Explain `Array.reduce` for total calculation (L27)
+  - [x] Explain `onSave` callback pattern in `AddExpenseForm`
+  - [x] Adjust custom categories (Bebida, Ropa)
+  - [x] Copy Implementation Plan to `src/`
+- [x] PWA Setup: Manifest & Service Worker
+- [x] Phase 1.5: Data Model & Category Alignment
+  - [x] Implement Pillar/Category hierarchy in types
+  - [x] Update `AddExpenseForm` with missing fields
+  - [x] Reconstruct Mock Data with original Pillars
+  - [x] Refactor: Remove Pillars, implement Category/Subcategory hierarchy
+  - [x] Feature: Edit existing expenses
+  - [x] Refinement: Subcategory display and deletion logic
+  - [x] Feature: Manage Places (add, delete, select)
+  - [x] Refinement: Make expense description optional
+  - [x] Action: Reset Database and refine Place selection auto-assignment
 - [ ] Phase 2: Kakebo Strategy & Budgeting
   - [ ] Update Types: `Income`, `FixedExpense`, `MonthlyPlan`
   - [ ] Update Store: Add budget management to `useExpenseStore`
   - [ ] UI: Create `MonthlyBudgetHeader` for available balance
   - [ ] UI: Create `BudgetSetupModal` for monthly planning
   - [ ] UI: Integrate "Daily Budget" calculation logic
+- [ ] Phase 3: Soft Delete & Recently Deleted Expenses
+  - [ ] UI: Add delete (trash) button to each expense item in `ExpenseList`
+  - [ ] UI: Create `DeletedExpensesList` component showing recently deleted expenses
+  - [ ] Store: Implement `restoreExpense`, `permanentlyDeleteExpense`, `clearDeletedExpenses` actions (already added)
+  - [ ] UI: Provide restore and permanent delete actions per item in deleted list
+  - [ ] UI: Add button to clear all deleted expenses manually
+  - [ ] Update total calculations to exclude deleted expenses
+  - [ ] Write tests for soft delete workflow
 - [ ] Planning Next Development Phase

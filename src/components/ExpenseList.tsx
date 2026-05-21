@@ -83,9 +83,25 @@ export function ExpenseList({ expenses, onExpenseClick }: Props) {
               </div>
             </div>
             <div className="text-right shrink-0 ml-4">
+            <div className="flex items-center gap-2">
               <p className="font-extrabold text-gray-900 text-lg tracking-tight">
                 -{formatCurrency(expense.amount)}
               </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm('¿Estás seguro de eliminar este gasto?')) {
+                    const { removeExpense } = useExpenseStore.getState();
+                    removeExpense(expense.id);
+                  }
+                }}
+                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                title="Eliminar gasto"
+              >
+                <LucideIcons.Trash2 className="w-5 h-5" />
+              </button>
+            </div>
               <p className="text-[10px] text-gray-400 mt-0.5 font-bold tabular-nums">
                 {formatDateString(expense.date)} • {timeStr}
               </p>

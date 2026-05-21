@@ -56,7 +56,16 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
       setLocation('');
       setDate(new Date().toISOString().slice(0, 16));
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, categories]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
 
   // Filter subcategories based on selected category
   const filteredSubCategories = subCategories.filter(sub => sub.categoryId === categoryId);
@@ -505,10 +514,17 @@ export function AddExpenseForm({ isOpen, onClose, onSave, initialData }: Props) 
             </div>
           </div>
 
-          <div className="pt-6 sticky bottom-0 bg-white/100 backdrop-blur-sm pb-2 z-20">
+          <div className="pt-6 sticky bottom-0 bg-white/100 backdrop-blur-sm pb-2 z-20 flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-100 text-gray-700 font-bold text-lg py-4 rounded-2xl shadow-sm hover:bg-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              Cancelar
+            </button>
             <button
               type="submit"
-              className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl shadow-xl hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="flex-[2] bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl shadow-xl hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {initialData ? 'Actualizar Gasto' : 'Guardar Gasto'}
             </button>

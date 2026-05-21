@@ -2,9 +2,13 @@ import { useState } from 'react';
 import type { Expense, ExpenseType } from './types';
 import { useExpenseStore } from './store/useExpenseStore';
 import { ExpenseList } from './components/ExpenseList';
+import { DeletedExpensesModal } from './components/DeletedExpensesModal';
 import { AddExpenseForm } from './components/AddExpenseForm';
+// useState for deleted modal moved inside component
 import { AdvancedFilters } from './components/AdvancedFilters';
-import { Plus, Wallet, TrendingDown, Search, SlidersHorizontal } from 'lucide-react';
+import { MonthlyBudgetHeader } from './components/MonthlyBudgetHeader';
+import { BudgetSetupModal } from './components/BudgetSetupModal';
+import { Plus, TrendingDown, Search, SlidersHorizontal, Trash } from 'lucide-react';
 import './index.css';
 
 const INITIAL_FILTERS = {
@@ -20,7 +24,9 @@ const INITIAL_FILTERS = {
 
 function App() {
   const { expenses, categories, places, addExpense, updateExpense } = useExpenseStore();
+  const [isDeletedModalOpen, setIsDeletedModalOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBudgetSetupOpen, setIsBudgetSetupOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -96,9 +102,9 @@ function App() {
     return true;
   });
 
-  // Calculate total (we show the total of all expenses currently existing in view, or all?)
-  // Let's show the total of all as a general summary (existing behavior)
-  const totalAmount = expenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
   const hasActiveAdvancedFilters = Object.values(advancedFilters).some(v => v !== '' && v !== 'all');
   
@@ -119,17 +125,20 @@ function App() {
               <p className="text-indigo-100 text-sm font-medium tracking-wide">Hola, Jose</p>
               <h1 className="text-2xl font-bold tracking-tight">Kakebo</h1>
             </div>
-            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md">
-              <Wallet className="w-5 h-5" />
-            </div>
+            <button
+                  type="button"
+                  onClick={() => setIsDeletedModalOpen(true)}
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md text-gray-200 hover:bg-white/20 hover:text-white transition-colors"
+                >
+                  <Trash className="w-5 h-5" />
+                </button>
           </div>
 
-          <div className="text-center mt-2">
-            <p className="text-indigo-100 text-sm font-medium uppercase tracking-wider mb-1">Gasto Total</p>
-            <h2 className="text-5xl font-extrabold text-white tracking-tighter">
-              {totalAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-2xl font-semibold opacity-70">€</span>
-            </h2>
-          </div>
+          <MonthlyBudgetHeader 
+            currentMonth={currentMonth}
+            currentYear={currentYear}
+            onOpenSetup={() => setIsBudgetSetupOpen(true)}
+          />
         </div>
       </header>
 
@@ -219,7 +228,15 @@ function App() {
         onSave={handleSaveExpense}
         initialData={editingExpense}
       />
-
+      {/* Deleted Expenses Modal */}
+      <DeletedExpensesModal isOpen={isDeletedModalOpen} onClose={() => setIsDeletedModalOpen(false)} />
+      {/* Budget Setup Modal */}
+      <BudgetSetupModal 
+        isOpen={isBudgetSetupOpen} 
+        onClose={() => setIsBudgetSetupOpen(false)} 
+        currentMonth={currentMonth}
+        currentYear={currentYear}
+      />
     </div>
   )
 }
